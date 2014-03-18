@@ -1,8 +1,9 @@
 FROM ubuntu
 
+# Install some basic ubuntu packages
+
 RUN sed 's/main$/main universe/' -i /etc/apt/sources.list
 RUN apt-get update
-
 RUN apt-get install -y python-software-properties
 RUN apt-get install -y git
 RUN apt-get install -y wget
@@ -10,19 +11,30 @@ RUN apt-get install -y mercurial
 RUN apt-get install -y build-essential
 RUN apt-get install -y net-tools
 
+# Install a specific Go version
+
 RUN wget 'https://go.googlecode.com/files/go1.2.linux-amd64.tar.gz'
 RUN tar -C / -xzf go1.2.linux-amd64.tar.gz
 RUN rm go1.2.linux-amd64.tar.gz
-ENV GOROOT /go
 
+# Setup Go
+
+ENV GOROOT /go
 RUN mkdir gopath
 ENV GOPATH /gopath
 ENV PATH $PATH:$GOPATH/bin:$GOROOT/bin
+
+# Install our application godockerweb
 
 RUN mkdir -p /gopath/src/github.com/awalterschulze/godockerweb
 RUN git clone https://github.com/awalterschulze/godockerweb /gopath/src/github.com/awalterschulze/godockerweb
 RUN (cd /gopath/src/github.com/awalterschulze/godockerweb && go install . )
 
-CMD ["godockerweb"]
-USER daemon
+# Expose the website port
+
 EXPOSE 8080
+
+# Run the godockerweb
+
+CMD ["godockerweb"]
+
